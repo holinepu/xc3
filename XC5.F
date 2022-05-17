@@ -1,4 +1,5 @@
 \ http://re-eject.gbadev.org/files/ThumbRefV2-beta.pdf  cortex M0 instruction set
+\ https://github.com/holinepu/xc3
 variable  +\?   variable  -?  cr .(   press \ to get 'each' instruction's disassembler, otherwise 'all'. )
 cr  key  dup '\' = #if  +\?  on  #then  '' =  #if  -? on  #then
 hex             include  hlaa12.f       include  inf.f   hex
@@ -188,7 +189,7 @@ variable  pc
 variable  last'                                 :  org  ( a' -- )  cp'  !  ;
 : here'.align.2  ( -- )  here'  1+  FFFFFFFE  and  org  ;
 : t: ( -- )   here'.align.2  last' @  32,'  ( lfa' )      here'  last'  !  ( new last' )
-  >in  @   bl word count tuck ( len a len )  here'  a'>a  place  >in    !  \ nfa'
+  >in  @   bl word count tuck ( len a len )  here'  a'>a  place  >in    !  \ nfa'   place nfa'
   1+  allot'  here'.align.2      \ adjusting here'                         \ cfa'
   create   here'   ,
   does>    @  32,'     ( dtc )  ;   \ ceForth
@@ -206,6 +207,19 @@ comment:
      (rm)      5  3  >?~?  +
      (#)      0a  6  >?~?  +
      16,'  ;
+comment;
+
+comment:
+: R=R<<#_
+  `5c5#3m3d                        00000000 =
+  if (2   2  0  12p   5  3  13p  0a  6  14p           ."  R=R<<#"
+  exit then 0 ;
+
+1 2 3  R=R<<#
+
+\  (  00000000  D1 00             )                     1           2         3 R=R<<#
+comment;
+
   original.mnemonic?  on     0000  5c5#3m3d:  lsl_R,R,#
   original.mnemonic?  off    0000  5c5#3m3d:  R=R<<#
   original.mnemonic?  on     0800  5c5#3m3d:  lsr_R,R,#
@@ -214,5 +228,6 @@ comment:
   original.mnemonic?  off    1000  5c5#3m3d:  R=R>>#,a
   cr
 comment;
+\s
 include  asm-xc2.f
 include  dis-xc2.f
